@@ -1,0 +1,8 @@
+
+Selain->Palvelin: new_note POST
+note over  Palvelin
+palvelin lisää lähetetyn tekstin data.jsoniin
+end note over 
+Palvelin->Selain: GET notes & main.js/css ja data.json
+
+
