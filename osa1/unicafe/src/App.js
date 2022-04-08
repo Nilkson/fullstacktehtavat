@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 const Display = (content) => {
   return (
-    <p>{content.feedback} {content.amount}</p>
+    <p>{content.feedback} {content.amount} {content.character}</p>
   )
 }
 
@@ -36,6 +36,9 @@ const App = () => {
       <Display feedback={'good'} amount={good} />
       <Display feedback={'neutral'} amount={neutral} />
       <Display feedback={'bad'} amount={bad} />
+      <Display feedback={'all'} amount={good + neutral + bad} />
+      <Display feedback={'average'} amount={(good - bad) / (good + neutral + bad)} />
+      <Display feedback={'positive'} amount={(good / (good + neutral + bad)) * 100} character={'%'}  />
     </div>
   )
 }
