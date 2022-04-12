@@ -12,20 +12,28 @@ const Statistics = (statistics) => {
 
   }
   return (
+
     <div>
-      <StatisticsLine text={'good'} value={good} />
-      <StatisticsLine text={'neutral'} value={neutral} />
-      <StatisticsLine text={'bad'} value={bad} />
-      <StatisticsLine text={'all'} value={good + bad + neutral} />
-      <StatisticsLine text={'average'} value={(good - bad) / (good + neutral + bad)} />
-      <StatisticsLine text={'positive'} value={(good / (good + neutral + bad)) * 100} character={'%'} />
+      <table>
+      <tbody>
+        <StatisticsLine text={'good'} value={good} />
+        <StatisticsLine text={'neutral'} value={neutral} />
+        <StatisticsLine text={'bad'} value={bad} />
+        <StatisticsLine text={'all'} value={good + bad + neutral} />
+        <StatisticsLine text={'average'} value={(good - bad) / (good + neutral + bad)} />
+        <StatisticsLine text={'positive'} value={(good / (good + neutral + bad)) * 100} character={'%'} />
+        </tbody>
+      </table>
     </div>
 
   )
 }
 const StatisticsLine = (statistics) => {
   return (
-    <p>{statistics.text} {statistics.value} {statistics.character}</p>
+    <tr>
+      <td>{statistics.text}</td>
+      <td>{statistics.value} {statistics.character}</td>
+    </tr>
   )
 
 }
