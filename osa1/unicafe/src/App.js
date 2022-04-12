@@ -1,8 +1,27 @@
 import { useState } from 'react'
 
-const Display = (content) => {
+const Statistics = (statistics) => {
+  var good = statistics.good;
+  var neutral = statistics.neutral;
+  var bad = statistics.bad;
+  console.log(statistics.good + statistics.bad + statistics.neutral);
+  
+  if (statistics.good + statistics.bad + statistics.neutral === 0) {
+    return (
+      <p>No feedback given</p>
+    )
+
+  }
   return (
-    <p>{content.feedback} {content.amount} {content.character}</p>
+    <div>
+    <p>good {good}</p>
+    <p>neutral {neutral}</p>
+    <p>bad {bad}</p>
+    <p>all {statistics.good}</p>
+    <p>average {(good - bad) / (good + neutral + bad)}</p>
+    <p>positive {(good / (good + neutral + bad)) * 100}%</p>
+    </div>
+
   )
 }
 
@@ -25,7 +44,7 @@ const App = () => {
     'give feedback',
     'statistics'
   ]
-  
+
   return (
     <div>
       <Header text={headers[0]} />
@@ -33,12 +52,7 @@ const App = () => {
       <Button handleClick={() => setNeutral(neutral + 1)} text="neutral" />
       <Button handleClick={() => setBad(bad + 1)} text="bad" />
       <Header text={headers[1]} />
-      <Display feedback={'good'} amount={good} />
-      <Display feedback={'neutral'} amount={neutral} />
-      <Display feedback={'bad'} amount={bad} />
-      <Display feedback={'all'} amount={good + neutral + bad} />
-      <Display feedback={'average'} amount={(good - bad) / (good + neutral + bad)} />
-      <Display feedback={'positive'} amount={(good / (good + neutral + bad)) * 100} character={'%'}  />
+      <Statistics good={good} neutral={neutral} bad={bad} />
     </div>
   )
 }
