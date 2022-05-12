@@ -25,8 +25,8 @@ const App = () => {
   const [mostPoints, setMostPoints] = useState(0)
 
   function addPoints() {
-    console.log('indeksi ' + points);
-    console.log('lista päivityksen jälkeen ' + points);
+    console.log('indeksi ', points);
+    console.log('lista päivityksen jälkeen ', points);
     setPoints(existingItems => {
       return [
         ...existingItems.slice(0, selected),
