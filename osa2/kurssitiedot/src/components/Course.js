@@ -3,7 +3,8 @@ import Content from './Content'
 import Total from './Total'
 
 const Course = ({course}) => {
-    console.log(course);
+    console.log("course tulostus", course);
+    console.log("kurssin nimi course komponentissa ", course.name);
     return (
         <div>
             <Header name={course.name} />
