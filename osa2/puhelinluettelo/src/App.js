@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -29,17 +32,18 @@ const App = () => {
   }
 
   const personstoShow = filter === ""
-  ? persons
-  : persons.filter(person => person.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase))
+    ? persons
+    : persons.filter(person => person.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase()))
 
-  console.log(persons[0].name.toLocaleLowerCase().includes(filter));
-  console.log("vertailu", persons[0].name.localeCompare(filter, 'sv', {sensitivity: 'accent'}));
+  // console.log(persons[0].name.toLocaleLowerCase().includes(filter));
+  // console.log("vertailu", persons[0].name.localeCompare(filter, 'sv', { sensitivity: 'accent' }));
+
   const handleFilterChange = (event) => {
-    // console.log(event.target.value)
+    console.log(event.target.value)
     setFilter(event.target.value)
   }
 
-  const handlePersonChange = (event) => {
+  const handleNameChange = (event) => {
     // console.log(event.target.value)
     setNewName(event.target.value)
   }
@@ -50,24 +54,10 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-    filter shown with <input value={filter} onChange={handleFilterChange}/>
-      </div>
-      <h2>add a new</h2>
-      <form>
-        <div>
-          name: <input value={newName} onChange={handlePersonChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button onClick={addPerson} type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2><ul>
-        {personstoShow.map(person => <li key={person.name}> {person.name} {person.number}</li>)}
-      </ul>
+      <Filter value={filter} onChange={handleFilterChange} />
+      <PersonForm onClick={addPerson} numberValue={newNumber} nameValue={newName} onChangeNumber={handleNumberChange} onChangeName={handleNameChange} />
+      <h2>Numbers</h2>
+      <Persons personstoShow={personstoShow} />
     </div>
   )
 
