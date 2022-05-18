@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const Button = (props) => {
+  const { country, setNewFilter, text } = props
+    return (
+      <button onClick={() => setNewFilter(country)}>{text}</button>
+    )
+}
+
 const Countries = (props) => {
-  const { countries, filter } = props
+  const { countries, filter, setNewFilter } = props
   console.log('filtteri ', filter);
   const countriestoShow = filter === ""
     ? countries
@@ -18,21 +25,21 @@ const Countries = (props) => {
   } else if (countriestoShow.length <= 10 && countriestoShow.length > 1) {
     return (
       <ul>
-        {countriestoShow.map(country => <li key={country.name.common}> {country.name.common}</li>)}
+        {countriestoShow.map(country => <li key={country.name.common}> {country.name.common} <Button text={"show"} country={country.name.common} setNewFilter={setNewFilter}></Button></li>)}
       </ul>
     )
   } else {
     const country = countriestoShow[0]
-    console.log("kielet ",Object.values(country.languages));
+    console.log("kielet ", Object.values(country.languages));
     return (
       <div>
         <h3>{country.name.common}</h3>
         capital {country.capital}
-        <br/>
+        <br />
         area {country.area}
         <h2>languages</h2>
         <ul>
-        {Object.values(country.languages).map(language => <li key={language}>{language}</li> )}
+          {Object.values(country.languages).map(language => <li key={language}>{language}</li>)}
         </ul>
         <img src={country.flags.png} alt={country.name.common, "flag"}></img>
       </div>
@@ -67,7 +74,7 @@ const App = () => {
   return (
     <div className="App">
       find countries <input value={newFilter} onChange={handleFilterChange} />
-      <Countries countries={countries} filter={newFilter} />
+      <Countries countries={countries} filter={newFilter} setNewFilter={setNewFilter} />
     </div>
   );
 }
