@@ -1,0 +1,2 @@
+cmd set "REACT_APP_API_KEY=asdfaferwf"
+powershell ($env:REACT_APP_API_KEY = "abcdef")

@@ -1,11 +1,45 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const api_key = process.env.REACT_APP_API_KEY
+
 const Button = (props) => {
   const { country, setNewFilter, text } = props
+  return (
+    <button onClick={() => setNewFilter(country)}>{text}</button>
+  )
+}
+const Weather = (props) => {
+  const [weatherData, setweatherData] = useState([])
+  const { country } = props
+
+  useEffect(() => {
+    axios
+      .get(`http://api.openweathermap.org/data/2.5/weather?q=${country.capital}&units=metric&APPID=${api_key}`)
+      .then(response => {
+        console.log("promise fulfilled");
+        setweatherData(response.data)
+        console.log("response data ", response.data);
+      })
+  }, [])
+  console.log("säädata ", weatherData);
+
+  if (weatherData.length === 0) {
+    return
+  } else {
+    console.log("sääikoni id ", weatherData.weather[0].icon);
     return (
-      <button onClick={() => setNewFilter(country)}>{text}</button>
+      <div>
+        <h1>Weather in {country.capital}</h1>
+        temperature {weatherData.main.temp} Celsius
+        <div>
+          <img src={`http://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`} alt={weatherData.weather.description}></img>
+        </div>
+        wind {weatherData.wind.speed} m/s
+      </div>
     )
+  }
+
 }
 
 const Countries = (props) => {
@@ -15,6 +49,7 @@ const Countries = (props) => {
     ? countries
     : countries.filter(countries => countries.name.common.toLocaleLowerCase().includes(filter.toLocaleLowerCase()))
   console.log('filtered ', countriestoShow);
+
   if (countriestoShow.length === 0) {
     return
   }
@@ -33,7 +68,7 @@ const Countries = (props) => {
     console.log("kielet ", Object.values(country.languages));
     return (
       <div>
-        <h3>{country.name.common}</h3>
+        <h1>{country.name.common}</h1>
         capital {country.capital}
         <br />
         area {country.area}
@@ -42,6 +77,7 @@ const Countries = (props) => {
           {Object.values(country.languages).map(language => <li key={language}>{language}</li>)}
         </ul>
         <img src={country.flags.png} alt={country.name.common, "flag"}></img>
+        <Weather country={country} />
       </div>
     )
   }
@@ -50,8 +86,10 @@ const Countries = (props) => {
 
 const App = () => {
   const [countries, setCountries] = useState([])
-
   const [newFilter, setNewFilter] = useState('')
+
+
+  console.log("api ", api_key);
 
   useEffect(() => {
     console.log('effect')
