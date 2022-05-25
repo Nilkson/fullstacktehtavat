@@ -2,18 +2,17 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
-import Persons from './components/Persons'
+import PersonList from './components/PersonList'
+import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
 
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
   }, [])
 
@@ -33,11 +32,30 @@ const App = () => {
     if (persons.find(person => person.name === newName)) {
       alert(`${newName} is already added to phonebook`)
     } else {
-      setPersons(persons.concat(personObject))
-      setNewName("")
-      setNewNumber("")
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName("")
+          setNewNumber("")
+        })
     }
 
+  }
+  const removePerson = (id) => {
+console.log("person id ", id);
+    personService
+    .remove(id)
+    .then(response => {
+      console.log(response);
+    })
+
+    personService
+    .getAll()
+    .then(updatedPersons => {
+      setPersons(updatedPersons)
+      console.log("lista päivitetty ", updatedPersons);
+    })
   }
   //persons listan filtteröiminen, ei tee mitään jos filter kenttään ei ole kirjoitettu, testattava nimi ja haettava nimi muutetaan pieniksi kirjaimiksi ja suoriteen vertailu.
   const personstoShow = filter === ""
@@ -66,7 +84,7 @@ const App = () => {
       <Filter value={filter} onChange={handleFilterChange} />
       <PersonForm onClick={addPerson} numberValue={newNumber} nameValue={newName} onChangeNumber={handleNumberChange} onChangeName={handleNameChange} />
       <h2>Numbers</h2>
-      <Persons personstoShow={personstoShow} />
+      <PersonList personstoShow={personstoShow} onClick={removePerson} />
     </div>
   )
 
