@@ -30,7 +30,24 @@ const App = () => {
       number: newNumber
     }
     if (persons.find(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        const personToUpdate = persons.find(person => person.name === newName)
+        console.log("update ", personToUpdate);
+        personService
+          .update(personToUpdate.id, personObject)
+          .then(returnedPerson => {
+            console.log(returnedPerson);
+            const index = persons.findIndex(person => person.name === returnedPerson.name)
+            const personsCopy = persons
+            personsCopy[index] = returnedPerson
+            console.log("persons list copy ", personsCopy);
+            setPersons(personsCopy)
+            setNewName("")
+            setNewNumber("")
+          })
+
+      }
+      return
     } else {
       personService
         .create(personObject)
@@ -42,20 +59,21 @@ const App = () => {
     }
 
   }
-  const removePerson = (id) => {
-console.log("person id ", id);
-    personService
-    .remove(id)
-    .then(response => {
-      console.log(response);
-    })
+  async function removePerson(id, name) {
+    if (window.confirm(`Delete ${name}`)) {
+      console.log("poistetaan id ", id);
+      await personService
+        .remove(id)
+      console.log("delete succesfull");
 
-    personService
-    .getAll()
-    .then(updatedPersons => {
-      setPersons(updatedPersons)
-      console.log("lista päivitetty ", updatedPersons);
-    })
+      personService
+        .getAll()
+        .then(loadedPersons => {
+          setPersons(loadedPersons)
+          console.log(loadedPersons);
+        })
+    }
+
   }
   //persons listan filtteröiminen, ei tee mitään jos filter kenttään ei ole kirjoitettu, testattava nimi ja haettava nimi muutetaan pieniksi kirjaimiksi ja suoriteen vertailu.
   const personstoShow = filter === ""
