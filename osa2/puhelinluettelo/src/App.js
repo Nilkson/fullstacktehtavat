@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import './index.css'
+import Notification from './components/Notification'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import PersonList from './components/PersonList'
@@ -7,6 +8,7 @@ import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
+  const [message, setMessage] = useState("")
 
   useEffect(() => {
     personService
@@ -29,20 +31,22 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    //testi
+    //check if person is already in the list by name
     if (persons.find(person => person.name === newName)) {
+
+      const index = persons.findIndex(person => person.name === newName)
+//if name is in list, ask if user want to update the number associated to that name
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-        const personToUpdate = persons.find(person => person.name === newName)
-        console.log("update ", personToUpdate);
+        console.log("update ", persons[index]);
         personService
-          .update(personToUpdate.id, personObject)
-          .then(returnedPerson => {
-            console.log(returnedPerson);
-            const index = persons.findIndex(person => person.name === returnedPerson.name)
+          .update(persons[index].id, personObject)
+          .then(updatedPerson => {
+            console.log(updatedPerson);
             const personsCopy = persons
-            personsCopy[index] = returnedPerson
+            personsCopy[index] = updatedPerson
             console.log("persons list copy ", personsCopy);
             setPersons(personsCopy)
+            setMessage(`Updated ${updatedPerson.name}`)
             setNewName("")
             setNewNumber("")
           })
@@ -50,10 +54,12 @@ const App = () => {
       }
       return
     } else {
+      //if not add person to list
       personService
         .create(personObject)
-        .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson))
+        .then(addedPerson => {
+          setPersons(persons.concat(addedPerson))
+          setMessage(`Added ${addedPerson.name}`)
           setNewName("")
           setNewNumber("")
         })
@@ -65,6 +71,7 @@ const App = () => {
       console.log("poistetaan id ", id);
       await personService
         .remove(id)
+        setMessage(`Removed ${name}`)
       console.log("delete succesfull");
 
       personService
@@ -76,7 +83,7 @@ const App = () => {
     }
 
   }
-  //persons listan filtteröiminen, ei tee mitään jos filter kenttään ei ole kirjoitettu, testattava nimi ja haettava nimi muutetaan pieniksi kirjaimiksi ja suoriteen vertailu.
+  //persons list filtering, both name in list and filter input converted to lowercase for comparison
   const personstoShow = filter === ""
     ? persons
     : persons.filter(person => person.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase()))
@@ -100,6 +107,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter value={filter} onChange={handleFilterChange} />
       <PersonForm onClick={addPerson} numberValue={newNumber} nameValue={newName} onChangeNumber={handleNumberChange} onChangeName={handleNameChange} />
       <h2>Numbers</h2>
