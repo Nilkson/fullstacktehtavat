@@ -29,6 +29,7 @@ const App = () => {
       name: newName,
       number: newNumber
     }
+    //testi
     if (persons.find(person => person.name === newName)) {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         const personToUpdate = persons.find(person => person.name === newName)
