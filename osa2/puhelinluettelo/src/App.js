@@ -8,7 +8,9 @@ import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
-  const [message, setMessage] = useState("")
+  //usestates for notifications and their type true=error false= normal notification, initialized as null to hide element
+  const [message, setMessage] = useState(null)
+  const [isError, setIsError] = useState(true)
 
   useEffect(() => {
     personService
@@ -26,7 +28,6 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    console.log('button clicked', event.target)
     const personObject = {
       name: newName,
       number: newNumber
@@ -35,20 +36,28 @@ const App = () => {
     if (persons.find(person => person.name === newName)) {
 
       const index = persons.findIndex(person => person.name === newName)
-//if name is in list, ask if user want to update the number associated to that name
+      //if name is in list, ask if user want to update the number associated to that name
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         console.log("update ", persons[index]);
         personService
           .update(persons[index].id, personObject)
           .then(updatedPerson => {
-            console.log(updatedPerson);
-            const personsCopy = persons
-            personsCopy[index] = updatedPerson
-            console.log("persons list copy ", personsCopy);
-            setPersons(personsCopy)
-            setMessage(`Updated ${updatedPerson.name}`)
+
+            // console.log(updatedPerson);
+            // const personsCopy = persons
+            // personsCopy[index] = updatedPerson
+            // console.log("persons list copy ", personsCopy);
+            // setPersons(personsCopy)
+
+            //updates person list with result as code above i think?
+            setPersons(persons.map(person => person.id !== updatedPerson.id ? person : updatedPerson))
+            showFiveSecondMessage(`Updated ${updatedPerson.name}`, false)
             setNewName("")
             setNewNumber("")
+          })
+          .catch(error => {
+            showFiveSecondMessage(`${newName} was already deleted from server`, true)
+            setPersons(persons.filter(person => person.id !== persons[index].id))
           })
 
       }
@@ -59,27 +68,42 @@ const App = () => {
         .create(personObject)
         .then(addedPerson => {
           setPersons(persons.concat(addedPerson))
-          setMessage(`Added ${addedPerson.name}`)
+          showFiveSecondMessage(`Added ${addedPerson.name}`, false)
           setNewName("")
           setNewNumber("")
         })
     }
 
   }
+  const showFiveSecondMessage = (message, messageType) => {
+    console.log("isError ", messageType);
+    setMessage(message)
+    setIsError(messageType)
+    setTimeout(() => {
+      setMessage(null)
+    }, 5000)
+  }
   async function removePerson(id, name) {
     if (window.confirm(`Delete ${name}`)) {
       console.log("poistetaan id ", id);
       await personService
         .remove(id)
-        setMessage(`Removed ${name}`)
+        .then(response => {
+          showFiveSecondMessage(`Removed ${name}`, false)
+          setPersons(persons.filter(person => person.id !== id))
+        })
+        .catch(error => {
+          showFiveSecondMessage(`${name} was already removed`, true)
+          setPersons(persons.filter(person => person.id !== id))
+        })
       console.log("delete succesfull");
 
-      personService
-        .getAll()
-        .then(loadedPersons => {
-          setPersons(loadedPersons)
-          console.log(loadedPersons);
-        })
+      // personService
+      //   .getAll()
+      //   .then(loadedPersons => {
+      //     setPersons(loadedPersons)
+      //     console.log(loadedPersons);
+      //   })
     }
 
   }
@@ -88,8 +112,6 @@ const App = () => {
     ? persons
     : persons.filter(person => person.name.toLocaleLowerCase().includes(filter.toLocaleLowerCase()))
 
-  // console.log(persons[0].name.toLocaleLowerCase().includes(filter));
-  // console.log("vertailu", persons[0].name.localeCompare(filter, 'sv', { sensitivity: 'accent' }));
 
   const handleFilterChange = (event) => {
     console.log(event.target.value)
@@ -97,17 +119,15 @@ const App = () => {
   }
 
   const handleNameChange = (event) => {
-    // console.log(event.target.value)
     setNewName(event.target.value)
   }
   const handleNumberChange = (event) => {
-    // console.log(event.target.value)
     setNewNumber(event.target.value)
   }
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} />
+      <Notification message={message} isError={isError} />
       <Filter value={filter} onChange={handleFilterChange} />
       <PersonForm onClick={addPerson} numberValue={newNumber} nameValue={newName} onChangeNumber={handleNumberChange} onChangeName={handleNameChange} />
       <h2>Numbers</h2>
